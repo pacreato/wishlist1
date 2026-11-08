@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мій вішліст</title>
+<style>
+:root {
+  --site-primary: #A9D5F2;
+  --site-secondary: #EAF6FD;
+  --site-background: #FFFCFD;
+  --site-on-primary: #FFFFFF;
+  --site-on-secondary: #593D46;
+  --site-on-background: #392B30;
+  --site-font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: ui-serif, Georgia, "Times New Roman", serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  --surface: light-dark(#FFFFFF, #282326);
+  --muted: light-dark(#806D73, #C2AEB5);
+  --line: light-dark(#EADDE0, #51444A);
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); background: var(--site-background); color: var(--site-on-background); }
+#app { min-height: 100vh; width: 100%; border-radius: 0; background-color: var(--site-background); overflow: hidden; }
+.hero { position: relative; background: var(--site-secondary); color: var(--site-on-secondary); padding: calc(52px * var(--site-spacing-scale)) 22px calc(42px * var(--site-spacing-scale)); text-align: center; }
+.hero:before,.hero:after { content: "✳"; position: absolute; opacity: calc(.16 * var(--site-decoration-opacity)); font-size: 90px; color: var(--site-primary); }
+.hero:before { left: 8%; top: 14px; transform: rotate(-15deg); }
+.hero:after { right: 9%; bottom: 0; transform: rotate(18deg); }
+.eyebrow { text-transform: uppercase; letter-spacing: .2em; font-size: 11px; font-weight: 700; color: var(--muted); }
+h1 { font: 500 calc(48px * var(--site-heading-scale))/1.08 var(--site-font-heading); margin: 12px 0; }
+.hero p { margin: 0 auto; max-width: 440px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.wrap { width: min(1080px, calc(100% - 36px)); margin: 0 auto; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 28px 0 18px; }
+.count { color: var(--muted); font-size: 13px; }
+.actions { display: flex; flex-wrap: wrap; gap: 9px; }
+button,.button { border: 0; border-radius: calc(999px * var(--site-radius-scale)); padding: 11px 17px; font: 600 13px var(--site-font-body); cursor: pointer; transition: transform .15s, opacity .15s; }
+button:hover { transform: translateY(-1px); }
+.primary { background: var(--site-primary); color: var(--site-on-primary); }
+.secondary { background: var(--surface); color: var(--site-on-background); border: 1px solid var(--line); }
+#shareBtn { background: var(--site-primary); color: #31546B; border: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 18px; }
+.filter { background: transparent; border: 1px solid var(--line); color: var(--muted); padding: 8px 14px; }
+.filter.active { background: var(--site-secondary); color: var(--site-on-secondary); border-color: transparent; }
+.grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; padding-bottom: 44px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: calc(18px * var(--site-radius-scale)); overflow: hidden; min-width: 0; }
+.photo { height: 190px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(145deg,#F3FAFE,#E4F3FC); font-size: 62px; }
+.photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.card-body { padding: 16px; }
+.category { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: .14em; }
+.card h2 { font: 500 21px var(--site-font-heading); margin: 7px 0 5px; }
+.price { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.card-foot a { color: var(--site-primary); font-size: 12px; font-weight: 700; text-decoration: none; }
+.card-foot a:hover { text-decoration: underline; }
+.reserve { background: var(--site-primary); color: #31546B; padding: 8px 11px; font-size: 11px; }
+.reserve.done { background: light-dark(#E5EFE6,#344438); color: light-dark(#385640,#D6E8D8); }
+.empty { grid-column: 1/-1; padding: 42px 16px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 18px; }
+footer { border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: 12px; padding: 24px 12px 32px; }
+.modal-backdrop { position: fixed; inset: 0; background: #24171dcc; display: none; align-items: center; justify-content: center; padding: 18px; z-index: 5; }
+.modal-backdrop.open { display: flex; }
+.modal { width: min(440px,100%); background: var(--surface); color: var(--site-on-background); border-radius: 20px; padding: 24px; box-shadow: 0 20px 70px #0003; }
+.modal h2 { font: 500 28px var(--site-font-heading); margin: 0 0 16px; }
+.field { display: grid; gap: 6px; margin: 12px 0; }
+.field label { font-size: 12px; color: var(--muted); }
+.field input,.field select { width: 100%; border: 1px solid var(--line); background: var(--site-background); color: var(--site-on-background); border-radius: 10px; padding: 11px; font: 14px var(--site-font-body); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+@media(max-width:760px) { .grid { grid-template-columns: repeat(2,minmax(0,1fr)); } h1 { font-size: calc(40px * var(--site-heading-scale)); } .photo { height: 160px; } }
+@media(max-width:480px) { .grid { grid-template-columns: 1fr 1fr; gap: 10px; } .photo { height: 125px; font-size: 46px; } .card-body { padding: 12px; } .card h2 { font-size: 17px; } .card-foot { align-items: flex-start; flex-direction: column; } .hero:before { left: 2%; } .hero:after { right: 2%; } }
+:root { color-scheme: light; --site-background:#F8FCFF; --site-secondary:#F0F8FF; --site-on-secondary:#F05A91; --site-on-background:#F05A91; --surface:#FFFFFF; --muted:#7786A8; --line:#D8ECFC; }
+body { background:#F8FCFF; color:#F05A91; }
+.hero { background:linear-gradient(135deg,#F7FCFF,#EAF6FF); color:#F05A91; padding:34px 22px 28px; }
+.hero:before,.hero:after { content:"♡"; color:#A9D5F2; opacity:.75; font-size:76px; }
+.eyebrow { color:#F18BB0; }
+h1 { color:#F05A91; font-family:"Brush Script MT","Segoe Script",cursive; font-size:clamp(44px,7vw,68px); font-weight:700; }
+.hero p { color:#7885A8; }
+.toolbar { padding-top:22px; }
+.count { color:#7885A8; }
+#shareBtn { background:#F47FA9; color:#FFFFFF; border:1px solid #EE6F9D; padding:13px 22px; }
+#addBtn,.primary { background:#F47FA9; color:#FFFFFF; }
+.filter { background:#FFFFFF; border:1px solid #D8ECFC; color:#E65B91; }
+.filter.active { background:#FFE4EF; color:#D9437D; border-color:#FFC8DC; }
+.grid { gap:18px; }
+.card { background:#FFFFFF; border:1.5px solid #D8ECFC; border-radius:24px; box-shadow:0 3px 12px #A9D5F21F; }
+.photo { height:190px; margin:8px 8px 0; border-radius:19px; background:linear-gradient(145deg,#EAF5FF,#DCEEFF); }
+.photo img { object-fit:contain; }
+.card-body { padding:12px 16px 16px; }
+.category { display:inline-block; color:#D9437D; background:#FFE3EE; border-radius:999px; padding:4px 9px; font-weight:700; letter-spacing:.04em; }
+.card h2 { color:#F05A91; font-family:var(--site-font-body); font-weight:750; line-height:1.18; }
+.price { color:#7885A8; font-weight:600; }
+.card-foot { flex-direction:column; align-items:stretch; gap:9px; }
+.card-foot a { color:#168DD0; text-align:center; font-size:14px; }
+.reserve { background:#A9D5F2; color:#174F78; border-radius:999px; padding:11px 14px; font-size:14px; width:100%; }
+.reserve.done { background:#E5F3E9; color:#386B4A; }
+footer { color:#9A8DA7; border-color:#D8ECFC; }
+@media(max-width:760px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .photo { height:155px; } }
+@media(max-width:480px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .photo { height:118px; margin:6px 6px 0; } .card-body { padding:9px; } .card h2 { font-size:15px; } .card-foot { gap:7px; } .card-foot a { font-size:12px; } .reserve { font-size:12px; padding:9px 6px; } }
+.adm{display:flex;gap:6px}.adm button{flex:1;padding:8px 6px;font-size:12px}.reserve:disabled{cursor:default;transform:none}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hero">
+    <div class="eyebrow">маленькі мрії та великі бажання</div>
+    <h1>My Wishlist ♡</h1>
+    <p>Тут зібрано те, що приносить радість. Обирай будь-яке бажання — і нехай мрії збуваються.</p>
+  </header>
+  <main class="wrap">
+    <section class="toolbar">
+      <div class="count" id="count">Мої бажання · 6</div>
+      <div class="actions">
+        <button class="secondary" id="shareBtn">Поділитися ↗</button>
+        <button class="primary" id="addBtn" style="display:none">＋ Додати бажання</button>
+      </div>
+    </section>
+    <nav class="filters" aria-label="Фільтр бажань">
+      <button class="filter active" data-filter="all">Усі</button>
+      <button class="filter" data-filter="toys">Іграшки</button>
+      <button class="filter" data-filter="creative">Творчість</button>
+      <button class="filter" data-filter="active">Активні ігри</button>
+    </nav>
+    <section class="grid" id="grid" aria-live="polite"></section>
+  </main>
+  <footer>З любов’ю до своїх бажань · My Wishlist · <a href="#" id="adminLink" onclick="return false" style="color:inherit;text-decoration:none;opacity:.5">🔑</a></footer>
+</div>
+<div class="modal-backdrop" id="modalBackdrop">
+  <form class="modal" id="wishForm">
+    <h2 id="formTitle">Нове бажання ♡</h2>
+    <div class="field"><label for="wishName">Що бажаєш?</label><input id="wishName" maxlength="60" placeholder="Наприклад, навушники" required></div>
+    <div class="field"><label for="wishPrice">Ціна (необов’язково)</label><input id="wishPrice" maxlength="30" placeholder="Наприклад, 2 500 грн"></div>
+    <div class="field"><label for="wishLink">Посилання на товар</label><input id="wishLink" type="url" placeholder="https://..."></div>
+    <div class="field"><label for="wishCategory">Категорія</label><select id="wishCategory"><option value="toys">Іграшки</option><option value="creative">Творчість</option><option value="active">Активні ігри</option></select></div>
+    <div class="field"><label for="wishEmoji">Іконка</label><input id="wishEmoji" maxlength="4" placeholder="🎁"></div>
+    <div class="field"><label for="wishImage">Посилання на фото (необов’язково)</label><input id="wishImage" type="url" placeholder="https://..."></div>
+    <div class="modal-actions"><button type="button" class="secondary" id="cancelBtn">Скасувати</button><button class="primary" type="submit">Додати</button></div>
+  </form>
+</div>
+<script>
+let W=[],admin=false,T=sessionStorage.getItem('wt')||'',F='all',editId=null;
+const MY=(()=>{try{return JSON.parse(localStorage.getItem('wlMine'))||{}}catch{return{}}})();
+const $=id=>document.getElementById(id),grid=$('grid'),backdrop=$('modalBackdrop'),labels={toys:'Іграшки',creative:'Творчість',active:'Активні ігри'};
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const saveMy=()=>{try{localStorage.setItem('wlMine',JSON.stringify(MY))}catch{}};
+async function api(m,u,b){const r=await fetch(u,{method:m,headers:Object.assign({'Content-Type':'application/json'},T?{Authorization:'Bearer '+T}:{}),body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j}
+async function load(){try{const x=await api('GET','/api/state');W=x.items;admin=!!x.admin;if(!admin&&T){T='';sessionStorage.removeItem('wt')}}catch(e){grid.innerHTML='<div class="empty">Не вдалося завантажити: '+e.message+'</div>';return}render()}
+function render(){
+ $('addBtn').style.display=admin?'':'none';$('adminLink').textContent=admin?'Вийти':'🔑';
+ const shown=W.filter(w=>F==='all'||w.category===F);
+ $('count').textContent='Бажань · '+W.length+' · вільних · '+W.filter(w=>!w.reserved).length;grid.innerHTML='';
+ if(!shown.length){grid.innerHTML='<div class="empty">У цій категорії поки немає бажань ♡</div>';return}
+ shown.forEach(w=>{
+  const card=el('article','card'),photo=el('div','photo');
+  if(w.image){const i=el('img');i.src=w.image;i.alt=w.name;i.loading='lazy';i.referrerPolicy='no-referrer';i.onerror=()=>{photo.textContent=w.emoji||'🎁'};photo.append(i)}else photo.textContent=w.emoji||'🎁';
+  const body=el('div','card-body'),foot=el('div','card-foot');
+  body.append(el('div','category',labels[w.category]||'Інше'),el('h2','',w.name));
+  if(w.price)body.append(el('div','price',w.price));
+  if(w.link){const a=el('a','','Де знайти ↗');a.href=w.link;a.target='_blank';a.rel='noopener noreferrer';foot.append(a)}
+  const b=el('button','reserve'+(w.reserved?' done':''));
+  if(!w.reserved){b.textContent='Забронювати';b.onclick=()=>reserve(w)}
+  else if(MY[w.id]||admin){b.textContent=(admin&&w.by?'Заброньовано: '+w.by:'Заброньовано ✓')+' · скасувати';b.onclick=()=>unreserve(w)}
+  else{b.textContent='Заброньовано ✓';b.disabled=true}
+  foot.append(b);
+  if(admin){const r=el('div','adm'),e=el('button','secondary','✎ Змінити'),d=el('button','secondary','🗑');e.onclick=()=>openForm(w);d.onclick=()=>delItem(w);r.append(e,d);foot.append(r)}
+  body.append(foot);card.append(photo,body);grid.append(card)})}
+async function reserve(w){const name=prompt('Як вас звати? (власник побачить, хто дарує)','');if(name===null)return;
+ try{const x=await api('POST','/api/reserve',{id:w.id,name});MY[w.id]=x.secret;saveMy()}catch(e){alert(e.message)}load()}
+async function unreserve(w){if(!confirm('Скасувати бронь?'))return;try{await api('POST','/api/unreserve',{id:w.id,secret:MY[w.id]});delete MY[w.id];saveMy()}catch(e){alert(e.message)}load()}
+async function delItem(w){if(!confirm('Видалити «'+w.name+'»?'))return;try{await api('POST','/api/delitem',{id:w.id})}catch(e){alert(e.message)}load()}
+function closeModal(){backdrop.classList.remove('open')}
+function openForm(w){editId=w?w.id:null;$('formTitle').textContent=w?'Редагувати ♡':'Нове бажання ♡';
+ $('wishName').value=w?w.name:'';$('wishPrice').value=(w&&w.price)||'';$('wishLink').value=(w&&w.link)||'';$('wishCategory').value=w?w.category:'toys';$('wishEmoji').value=(w&&w.emoji)||'';$('wishImage').value=(w&&w.image)||'';backdrop.classList.add('open')}
+$('addBtn').onclick=()=>openForm();$('cancelBtn').onclick=closeModal;backdrop.onclick=e=>{if(e.target===backdrop)closeModal()};
+$('wishForm').addEventListener('submit',async e=>{e.preventDefault();
+ const item={id:editId,name:$('wishName').value,price:$('wishPrice').value,link:$('wishLink').value,category:$('wishCategory').value,emoji:$('wishEmoji').value,image:$('wishImage').value};
+ try{await api('POST','/api/item',{item});closeModal();await load()}catch(err){alert(err.message)}});
+$('adminLink').onclick=async()=>{if(admin){T='';sessionStorage.removeItem('wt');admin=false;return load()}
+ const password=prompt('Пароль власника');if(!password)return;
+ try{const x=await api('POST','/api/login',{password});T=x.token;sessionStorage.setItem('wt',T);load()}catch(e){alert(e.message)}};
+document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');F=b.dataset.filter;render()}));
+$('shareBtn').addEventListener('click',async()=>{try{if(navigator.share)await navigator.share({title:'Мій вішліст',text:'Мій список бажань ♡',url:location.href});else{await navigator.clipboard.writeText(location.href);alert('Посилання скопійовано!')}}catch(e){}});
+load();
+</script>
+</body>
+</html>
